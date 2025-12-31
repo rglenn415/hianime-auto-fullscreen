@@ -3,32 +3,34 @@
 const manualEpisodeToggle = document.getElementById('manualEpisodeToggle');
 const autoplayEpisodeToggle = document.getElementById('autoplayEpisodeToggle');
 
-// Load current state
-browser.storage.local.get(['enableManualEpisode', 'enableAutoplayEpisode'])
+// Load current state with defaults
+browser.storage.local.get({
+  enableManualEpisode: true,
+  enableAutoplayEpisode: true
+})
   .then((result) => {
-    // Default both to true if not set
-    manualEpisodeToggle.checked = result.enableManualEpisode !== false;
-    autoplayEpisodeToggle.checked = result.enableAutoplayEpisode !== false;
+    manualEpisodeToggle.checked = result.enableManualEpisode;
+    autoplayEpisodeToggle.checked = result.enableAutoplayEpisode;
   })
   .catch((error) => {
     console.error('Error loading settings:', error);
-    // Use defaults (both enabled)
     manualEpisodeToggle.checked = true;
     autoplayEpisodeToggle.checked = true;
   });
 
-// Save state when manual episode toggle changes
-manualEpisodeToggle.addEventListener('change', () => {
-  browser.storage.local.set({ enableManualEpisode: manualEpisodeToggle.checked })
+// Helper function to save toggle state
+function saveToggleSetting(key, value) {
+  browser.storage.local.set({ [key]: value })
     .catch((error) => {
-      console.error('Error saving manual episode setting:', error);
+      console.error(`Error saving ${key}:`, error);
     });
+}
+
+// Save state when toggles change
+manualEpisodeToggle.addEventListener('change', () => {
+  saveToggleSetting('enableManualEpisode', manualEpisodeToggle.checked);
 });
 
-// Save state when autoplay episode toggle changes
 autoplayEpisodeToggle.addEventListener('change', () => {
-  browser.storage.local.set({ enableAutoplayEpisode: autoplayEpisodeToggle.checked })
-    .catch((error) => {
-      console.error('Error saving autoplay episode setting:', error);
-    });
+  saveToggleSetting('enableAutoplayEpisode', autoplayEpisodeToggle.checked);
 });

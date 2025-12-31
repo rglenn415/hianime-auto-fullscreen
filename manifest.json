@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "description": "Automatically fullscreens episodes on HiAnime with separate controls for manual and autoplay episodes",
   "author": "HiAnime Auto Fullscreen Contributors",
-  "homepage_url": "https://github.com/yourusername/hianime-auto-fullscreen",
+  "homepage_url": "https://github.com/rglenn415/hianime-auto-fullscreen",
 
   "browser_specific_settings": {
     "gecko": {

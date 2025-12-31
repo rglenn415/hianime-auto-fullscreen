@@ -28,6 +28,24 @@
     }
   }
 
+  // Helper function to check if currently in fullscreen mode
+  function isFullscreen() {
+    return !!(
+      document.fullscreenElement ||
+      document.webkitFullscreenElement ||
+      document.mozFullScreenElement ||
+      document.msFullscreenElement
+    );
+  }
+
+  // Helper function to clear autoplay monitoring interval
+  function clearAutoplayInterval() {
+    if (autoplayCheckInterval) {
+      clearInterval(autoplayCheckInterval);
+      autoplayCheckInterval = null;
+    }
+  }
+
   // Function to find the video player
   function findVideoPlayer() {
     // Common video player selectors for HiAnime
@@ -62,14 +80,7 @@
     log(`Triggering fullscreen for ${isAutoplayTransition ? 'autoplay' : 'manual'} episode`);
 
     // Check if already in fullscreen mode
-    const isCurrentlyFullscreen = !!(
-      document.fullscreenElement ||
-      document.webkitFullscreenElement ||
-      document.mozFullScreenElement ||
-      document.msFullscreenElement
-    );
-
-    if (isCurrentlyFullscreen) {
+    if (isFullscreen()) {
       log('Already in fullscreen mode - maintaining fullscreen state');
       hasTriggeredFullscreen = true;
       return;
@@ -115,22 +126,31 @@
         };
 
         try {
-          if (targetElement.requestFullscreen) {
-            targetElement.requestFullscreen(fullscreenOptions).then(() => {
-              log('Fullscreen request successful');
-              hasTriggeredFullscreen = true;
-            }).catch(err => {
-              log('Fullscreen request failed:', err.message);
-            });
-          } else if (targetElement.mozRequestFullScreen) {
-            targetElement.mozRequestFullScreen();
-            hasTriggeredFullscreen = true;
-          } else if (targetElement.webkitRequestFullscreen) {
-            targetElement.webkitRequestFullscreen();
-            hasTriggeredFullscreen = true;
-          } else if (targetElement.msRequestFullscreen) {
-            targetElement.msRequestFullscreen();
-            hasTriggeredFullscreen = true;
+          const fullscreenMethods = [
+            { method: 'requestFullscreen', supportsOptions: true },
+            { method: 'mozRequestFullScreen', supportsOptions: false },
+            { method: 'webkitRequestFullscreen', supportsOptions: false },
+            { method: 'msRequestFullscreen', supportsOptions: false }
+          ];
+
+          for (const { method, supportsOptions } of fullscreenMethods) {
+            if (targetElement[method]) {
+              const result = supportsOptions
+                ? targetElement[method](fullscreenOptions)
+                : targetElement[method]();
+
+              if (result && result.then) {
+                result.then(() => {
+                  log('Fullscreen request successful');
+                  hasTriggeredFullscreen = true;
+                }).catch(err => {
+                  log('Fullscreen request failed:', err.message);
+                });
+              } else {
+                hasTriggeredFullscreen = true;
+              }
+              break;
+            }
           }
         } catch (err) {
           log('Exception during fullscreen request:', err);
@@ -203,10 +223,7 @@
     isAutoplayTransition = true; // Mark next transition as autoplay
 
     // Clear any existing interval to prevent memory leaks
-    if (autoplayCheckInterval) {
-      clearInterval(autoplayCheckInterval);
-      autoplayCheckInterval = null;
-    }
+    clearAutoplayInterval();
 
     // Start monitoring more frequently for autoplay transition
     autoplayCheckInterval = setInterval(() => {
@@ -215,10 +232,7 @@
 
     // Stop frequent checking after configured duration
     setTimeout(() => {
-      if (autoplayCheckInterval) {
-        clearInterval(autoplayCheckInterval);
-        autoplayCheckInterval = null;
-      }
+      clearAutoplayInterval();
       log('Stopped frequent autoplay monitoring');
       // Reset autoplay flag if no transition happened
       if (isAutoplayTransition) {
@@ -256,17 +270,12 @@
 
     fullscreenEvents.forEach(eventName => {
       document.addEventListener(eventName, () => {
-        const isFullscreen = !!(
-          document.fullscreenElement ||
-          document.webkitFullscreenElement ||
-          document.mozFullScreenElement ||
-          document.msFullscreenElement
-        );
+        const fullscreenActive = isFullscreen();
 
-        log('Fullscreen state changed:', isFullscreen ? 'ENTERED' : 'EXITED');
+        log('Fullscreen state changed:', fullscreenActive ? 'ENTERED' : 'EXITED');
 
         // If user exits fullscreen, reset the flag so it can trigger again
-        if (!isFullscreen) {
+        if (!fullscreenActive) {
           hasTriggeredFullscreen = false;
           log('Fullscreen exited - auto-fullscreen will trigger on next episode');
         }
@@ -284,14 +293,7 @@
 
       // Don't reset fullscreen flag if already in fullscreen
       // This maintains fullscreen across episode changes
-      const isFullscreen = !!(
-        document.fullscreenElement ||
-        document.webkitFullscreenElement ||
-        document.mozFullScreenElement ||
-        document.msFullscreenElement
-      );
-
-      if (!isFullscreen) {
+      if (!isFullscreen()) {
         hasTriggeredFullscreen = false;
       }
       lastVideoSrc = null;
