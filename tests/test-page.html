@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HiAnime Auto Fullscreen - Test Page</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #1a1a1a;
+      color: #fff;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+      color: #4CAF50;
+    }
+
+    .info {
+      background: #2a2a2a;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border-left: 4px solid #4CAF50;
+    }
+
+    .player-container {
+      background: #000;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    video {
+      width: 100%;
+      display: block;
+    }
+
+    .controls {
+      background: #2a2a2a;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .controls h2 {
+      margin-bottom: 15px;
+      font-size: 18px;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #45a049;
+    }
+
+    button.secondary {
+      background: #2196F3;
+    }
+
+    button.secondary:hover {
+      background: #0b7dda;
+    }
+
+    button.danger {
+      background: #f44336;
+    }
+
+    button.danger:hover {
+      background: #da190b;
+    }
+
+    .playlist {
+      background: #2a2a2a;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .playlist h2 {
+      margin-bottom: 15px;
+      font-size: 18px;
+    }
+
+    .episode-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .episode-item {
+      background: #333;
+      padding: 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .episode-item:hover {
+      background: #404040;
+    }
+
+    .episode-item.playing {
+      background: #4CAF50;
+    }
+
+    .test-log {
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 15px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .test-log h2 {
+      font-family: 'Segoe UI', sans-serif;
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+
+    .log-entry {
+      margin-bottom: 5px;
+      padding: 5px;
+      border-left: 3px solid #4CAF50;
+      padding-left: 10px;
+    }
+
+    .log-entry.warning {
+      border-left-color: #FF9800;
+    }
+
+    .log-entry.error {
+      border-left-color: #f44336;
+    }
+
+    .settings {
+      background: #2a2a2a;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .settings label {
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    input[type="number"] {
+      background: #333;
+      border: 1px solid #555;
+      color: #fff;
+      padding: 8px;
+      border-radius: 4px;
+      width: 100px;
+      margin-left: 10px;
+    }
+
+    .status {
+      background: #2a2a2a;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .status-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #333;
+    }
+
+    .status-item:last-child {
+      border-bottom: none;
+    }
+
+    .status-value {
+      color: #4CAF50;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧪 HiAnime Auto Fullscreen - Test Page</h1>
+
+    <div class="info">
+      <p><strong>Purpose:</strong> Test the extension's autoplay and fullscreen functionality locally without HiAnime.</p>
+      <p><strong>Instructions:</strong> Use the controls below to simulate episode changes and test fullscreen behavior.</p>
+      <p><strong>Note:</strong> Open DevTools (F12) to see extension console logs.</p>
+    </div>
+
+    <!-- Video Player -->
+    <div class="player-container" id="playerContainer">
+      <video id="testVideo" controls>
+        <source src="" type="video/mp4">
+        Your browser doesn't support video playback.
+      </video>
+    </div>
+
+    <!-- Status -->
+    <div class="status">
+      <h2>📊 Current Status</h2>
+      <div class="status-item">
+        <span>Current Episode:</span>
+        <span class="status-value" id="currentEpisode">None</span>
+      </div>
+      <div class="status-item">
+        <span>Fullscreen:</span>
+        <span class="status-value" id="fullscreenStatus">No</span>
+      </div>
+      <div class="status-item">
+        <span>Video Source:</span>
+        <span class="status-value" id="videoSource">None</span>
+      </div>
+      <div class="status-item">
+        <span>Autoplay Enabled:</span>
+        <span class="status-value" id="autoplayStatus">No</span>
+      </div>
+      <div class="status-item">
+        <span>Last Transition:</span>
+        <span class="status-value" id="transitionType">None</span>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <h2>🎮 Test Controls</h2>
+
+      <div class="button-group">
+        <button onclick="loadEpisode(1)">Load Episode 1</button>
+        <button onclick="loadEpisode(2)">Load Episode 2</button>
+        <button onclick="loadEpisode(3)">Load Episode 3</button>
+        <button onclick="loadEpisode(4)">Load Episode 4</button>
+      </div>
+
+      <div class="button-group">
+        <button class="secondary" onclick="simulateAutoplay()">Simulate Autoplay</button>
+        <button class="secondary" onclick="skipToEnd()">Skip to End</button>
+        <button class="secondary" onclick="triggerEnded()">Trigger Ended Event</button>
+      </div>
+
+      <div class="button-group">
+        <button class="secondary" onclick="toggleFullscreen()">Toggle Fullscreen</button>
+        <button class="secondary" onclick="exitFullscreen()">Exit Fullscreen</button>
+      </div>
+
+      <div class="button-group">
+        <button class="danger" onclick="resetTest()">Reset Test</button>
+        <button class="danger" onclick="clearLog()">Clear Log</button>
+      </div>
+    </div>
+
+    <!-- Settings -->
+    <div class="settings">
+      <h2>⚙️ Settings</h2>
+      <label>
+        <input type="checkbox" id="autoplayEnabled" onchange="toggleAutoplay()">
+        Enable Autoplay (automatically play next episode when current ends)
+      </label>
+      <label>
+        Autoplay Delay (ms):
+        <input type="number" id="autoplayDelay" value="2000" min="0" max="10000" step="100">
+      </label>
+    </div>
+
+    <!-- Playlist -->
+    <div class="playlist">
+      <h2>📺 Episode Playlist</h2>
+      <div class="episode-list" id="episodeList"></div>
+    </div>
+
+    <!-- Test Log -->
+    <div class="test-log">
+      <h2>📝 Test Log</h2>
+      <div id="logContainer"></div>
+    </div>
+  </div>
+
+  <script>
+    // Test configuration
+    const episodes = [
+      { id: 1, title: 'Episode 1 - Introduction', duration: 30, src: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4' },
+      { id: 2, title: 'Episode 2 - The Adventure Begins', duration: 30, src: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4' },
+      { id: 3, title: 'Episode 3 - Rising Action', duration: 30, src: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4' },
+      { id: 4, title: 'Episode 4 - Climax', duration: 30, src: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4' }
+    ];
+
+    let currentEpisodeIndex = -1;
+    let autoplayEnabled = false;
+    let lastTransitionType = 'none'; // Track if last transition was manual or autoplay
+    const video = document.getElementById('testVideo');
+
+    // Initialize
+    function init() {
+      renderPlaylist();
+      attachVideoListeners();
+      updateStatus();
+      log('Test page initialized', 'info');
+    }
+
+    // Render episode playlist
+    function renderPlaylist() {
+      const list = document.getElementById('episodeList');
+      list.innerHTML = '';
+
+      episodes.forEach((ep, index) => {
+        const item = document.createElement('div');
+        item.className = 'episode-item';
+        if (index === currentEpisodeIndex) {
+          item.classList.add('playing');
+        }
+        item.innerHTML = `
+          <span>${ep.title} (${ep.duration}s)</span>
+          <button onclick="loadEpisode(${ep.id})">Play</button>
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    // Load an episode
+    function loadEpisode(episodeId, isAutoplay = false) {
+      const index = episodes.findIndex(ep => ep.id === episodeId);
+      if (index === -1) return;
+
+      currentEpisodeIndex = index;
+      const episode = episodes[index];
+
+      lastTransitionType = isAutoplay ? 'autoplay' : 'manual';
+
+      log(`Loading Episode ${episode.id}: ${episode.title} [${lastTransitionType}]`, 'info');
+
+      video.src = episode.src;
+      video.load();
+      video.play().catch(err => {
+        log(`Error playing video: ${err.message}`, 'error');
+      });
+
+      renderPlaylist();
+      updateStatus();
+    }
+
+    // Simulate autoplay to next episode
+    function simulateAutoplay() {
+      log('Simulating autoplay to next episode...', 'info');
+
+      const delay = parseInt(document.getElementById('autoplayDelay').value) || 2000;
+
+      setTimeout(() => {
+        const nextIndex = (currentEpisodeIndex + 1) % episodes.length;
+        loadEpisode(episodes[nextIndex].id, true); // Mark as autoplay
+        log(`Autoplay triggered: Episode ${episodes[nextIndex].id}`, 'info');
+      }, delay);
+    }
+
+    // Toggle autoplay
+    function toggleAutoplay() {
+      autoplayEnabled = document.getElementById('autoplayEnabled').checked;
+      updateStatus();
+      log(`Autoplay ${autoplayEnabled ? 'enabled' : 'disabled'}`, 'info');
+    }
+
+    // Skip to end of video
+    function skipToEnd() {
+      if (video.duration) {
+        video.currentTime = video.duration - 2; // 2 seconds before end
+        log('Skipped to end of video', 'info');
+      }
+    }
+
+    // Trigger ended event manually
+    function triggerEnded() {
+      log('Manually triggering ended event', 'info');
+      video.dispatchEvent(new Event('ended'));
+    }
+
+    // Toggle fullscreen
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        const container = document.getElementById('playerContainer');
+        if (container.requestFullscreen) {
+          container.requestFullscreen();
+        } else if (container.mozRequestFullScreen) {
+          container.mozRequestFullScreen();
+        } else if (container.webkitRequestFullscreen) {
+          container.webkitRequestFullscreen();
+        } else if (container.msRequestFullscreen) {
+          container.msRequestFullscreen();
+        }
+        log('Entering fullscreen', 'info');
+      } else {
+        exitFullscreen();
+      }
+    }
+
+    // Exit fullscreen
+    function exitFullscreen() {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+      }
+      log('Exiting fullscreen', 'info');
+    }
+
+    // Reset test
+    function resetTest() {
+      video.pause();
+      video.src = '';
+      currentEpisodeIndex = -1;
+      autoplayEnabled = false;
+      document.getElementById('autoplayEnabled').checked = false;
+      renderPlaylist();
+      updateStatus();
+      log('Test reset', 'info');
+    }
+
+    // Clear log
+    function clearLog() {
+      document.getElementById('logContainer').innerHTML = '';
+    }
+
+    // Attach video event listeners
+    function attachVideoListeners() {
+      const events = ['loadstart', 'loadedmetadata', 'play', 'playing', 'pause', 'ended', 'seeking', 'seeked'];
+
+      events.forEach(eventName => {
+        video.addEventListener(eventName, (e) => {
+          log(`Video event: ${eventName}`, 'info');
+          updateStatus();
+        });
+      });
+
+      // Ended event with autoplay
+      video.addEventListener('ended', () => {
+        if (autoplayEnabled) {
+          simulateAutoplay();
+        }
+      });
+    }
+
+    // Monitor fullscreen changes
+    document.addEventListener('fullscreenchange', () => {
+      updateStatus();
+      const isFullscreen = !!document.fullscreenElement;
+      log(`Fullscreen ${isFullscreen ? 'entered' : 'exited'}`, 'info');
+    });
+
+    ['webkitfullscreenchange', 'mozfullscreenchange', 'msfullscreenchange'].forEach(event => {
+      document.addEventListener(event, () => {
+        updateStatus();
+      });
+    });
+
+    // Update status display
+    function updateStatus() {
+      const isFullscreen = !!(
+        document.fullscreenElement ||
+        document.webkitFullscreenElement ||
+        document.mozFullScreenElement ||
+        document.msFullscreenElement
+      );
+
+      document.getElementById('currentEpisode').textContent =
+        currentEpisodeIndex >= 0 ? episodes[currentEpisodeIndex].title : 'None';
+
+      document.getElementById('fullscreenStatus').textContent = isFullscreen ? 'Yes' : 'No';
+      document.getElementById('fullscreenStatus').style.color = isFullscreen ? '#4CAF50' : '#f44336';
+
+      document.getElementById('videoSource').textContent =
+        video.src ? video.src.split('/').pop() : 'None';
+
+      document.getElementById('autoplayStatus').textContent = autoplayEnabled ? 'Yes' : 'No';
+      document.getElementById('autoplayStatus').style.color = autoplayEnabled ? '#4CAF50' : '#f44336';
+
+      document.getElementById('transitionType').textContent = lastTransitionType;
+      document.getElementById('transitionType').style.color =
+        lastTransitionType === 'autoplay' ? '#FF9800' :
+        lastTransitionType === 'manual' ? '#2196F3' : '#999';
+    }
+
+    // Log message
+    function log(message, type = 'info') {
+      const container = document.getElementById('logContainer');
+      const entry = document.createElement('div');
+      entry.className = `log-entry ${type}`;
+
+      const timestamp = new Date().toLocaleTimeString();
+      entry.textContent = `[${timestamp}] ${message}`;
+
+      container.appendChild(entry);
+      container.scrollTop = container.scrollHeight;
+
+      // Also log to console
+      console.log(`[Test Page] ${message}`);
+    }
+
+    // Initialize on load
+    window.addEventListener('load', init);
+  </script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+{
+  "manifest_version": 2,
+  "name": "HiAnime Auto Fullscreen",
+  "version": "1.0.0",
+  "description": "Automatically fullscreens episodes on HiAnime with separate controls for manual and autoplay episodes",
+  "author": "HiAnime Auto Fullscreen Contributors",
+  "homepage_url": "https://github.com/yourusername/hianime-auto-fullscreen",
+
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "hianime-autofullscreen@ryanglenn415@gmail.com",
+      "strict_min_version": "57.0"
+    }
+  },
+
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+
+  "content_scripts": [
+    {
+      "matches": ["*://*.hianime.to/*", "*://hianime.to/*"],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
+  ],
+
+  "browser_action": {
+    "default_title": "HiAnime Auto Fullscreen - Toggle Settings",
+    "default_popup": "popup.html"
+  }
+}
