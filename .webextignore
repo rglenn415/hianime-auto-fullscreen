@@ -1,0 +1,31 @@
+# Development and testing files
+node_modules/
+tests/
+coverage/
+.git/
+.github/
+web-ext-artifacts/
+dist/
+docs/
+
+# Development documentation
+*.md
+!README.md
+!LICENSE
+
+# Test and build files
+package.json
+package-lock.json
+jest.config.js
+.npmrc
+.gitignore
+.webextignore
+
+# Scripts and utilities
+build.js
+parse-validation-errors.js
+monitor-autoplay.js
+validation_error.txt
+validation_errors.csv
+CSV-ANALYSIS-GUIDE.md
+VALIDATION-FIXES.md

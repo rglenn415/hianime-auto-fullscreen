@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+
+# Testing
+coverage/
+*.log
+
+# Build artifacts
+web-ext-artifacts/
+dist/
+*.zip
+*.xpi
+
+# Development files
+validation_error.txt
+validation_errors.csv
+
+# IDE and OS files
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+.cache/
