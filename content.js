@@ -6,7 +6,7 @@
 
   // Configuration constants
   const CONFIG = {
-    DEBUG_MODE: false, // Set to true during development to see console logs
+    DEBUG_MODE: true, // Set to true during development to see console logs
     FULLSCREEN_DELAY_MS: 1000,
     PLAY_EVENT_DELAY_MS: 500,
     POLL_INTERVAL_MS: 2000,
@@ -46,14 +46,20 @@
     }
   }
 
-  // Function to find the video player
+  // Function to find the video player or iframe container
   function findVideoPlayer() {
-    // Common video player selectors for HiAnime
+    // First try to find iframe (used for movies and some episodes)
+    const iframe = document.querySelector('#iframe-embed') || document.querySelector('iframe[allow*="fullscreen"]');
+    if (iframe) {
+      log('Found iframe player:', iframe.id || 'unnamed iframe');
+      return iframe;
+    }
+
+    // Fallback to direct video elements
     const selectors = [
       'video',
       '#player video',
       '.video-player video',
-      'iframe',
       '.plyr video'
     ];
 
@@ -113,12 +119,21 @@
       hasTriggeredFullscreen = true;
     } else {
       // Fallback: use native fullscreen API with multi-monitor support
-      const video = findVideoPlayer();
-      const videoContainer = video?.closest('.plyr, .video-player, #player') || video;
-      const targetElement = videoContainer || video;
+      const player = findVideoPlayer();
+
+      // For iframes, target the iframe itself or its container
+      let targetElement;
+      if (player && player.tagName === 'IFRAME') {
+        // Try to find the player container first
+        targetElement = player.closest('.watch-player, .player-frame, #player') || player;
+        log('Targeting iframe container for fullscreen');
+      } else {
+        // For regular video elements, find the video container
+        targetElement = player?.closest('.plyr, .video-player, #player') || player;
+      }
 
       if (targetElement) {
-        log('Using native fullscreen API on:', targetElement.tagName);
+        log('Using native fullscreen API on:', targetElement.tagName, targetElement.className || '');
 
         // Request fullscreen with options for multi-monitor support
         const fullscreenOptions = {
@@ -163,10 +178,16 @@
 
   // Detect when a new episode starts
   function onVideoSourceChange() {
-    const video = findVideoPlayer();
-    if (!video) return;
+    const player = findVideoPlayer();
+    if (!player) return;
 
-    const currentSrc = video.src || video.currentSrc;
+    // Handle iframe players differently from video elements
+    let currentSrc;
+    if (player.tagName === 'IFRAME') {
+      currentSrc = player.src;
+    } else {
+      currentSrc = player.src || player.currentSrc;
+    }
 
     if (currentSrc && currentSrc !== lastVideoSrc) {
       log('Video source changed:', lastVideoSrc, '->', currentSrc);
@@ -194,16 +215,16 @@
     }
   }
 
-  // Monitor for DOM changes (for dynamically loaded videos)
+  // Monitor for DOM changes (for dynamically loaded videos/iframes)
   function setupMutationObserver() {
     const observer = new MutationObserver((mutations) => {
       for (const mutation of mutations) {
         if (mutation.addedNodes.length) {
-          const video = findVideoPlayer();
-          if (video && !video.hasAttribute('data-autofs-monitored')) {
-            log('New video element detected via mutation');
-            video.setAttribute('data-autofs-monitored', 'true');
-            attachVideoListeners(video);
+          const player = findVideoPlayer();
+          if (player && !player.hasAttribute('data-autofs-monitored')) {
+            log('New player element detected via mutation:', player.tagName);
+            player.setAttribute('data-autofs-monitored', 'true');
+            attachVideoListeners(player);
             onVideoSourceChange();
           }
         }
@@ -241,22 +262,44 @@
     }, CONFIG.AUTOPLAY_MONITOR_DURATION_MS);
   }
 
-  // Attach event listeners to video element
-  function attachVideoListeners(video) {
-    video.addEventListener('play', onVideoPlay);
-    video.addEventListener('ended', onVideoEnded);
-    video.addEventListener('loadedmetadata', () => {
-      log('Video metadata loaded');
-      onVideoSourceChange();
-    });
-    video.addEventListener('loadstart', () => {
-      log('Video load started');
-      onVideoSourceChange();
-    });
-    video.addEventListener('playing', () => {
-      log('Video playing event');
-      onVideoSourceChange();
-    });
+  // Attach event listeners to video element or monitor iframe
+  function attachVideoListeners(player) {
+    if (player.tagName === 'IFRAME') {
+      // For iframes, we can't access internal events
+      // Monitor the src attribute changes instead
+      log('Monitoring iframe for src changes');
+
+      // Watch for iframe src attribute changes
+      const iframeObserver = new MutationObserver((mutations) => {
+        for (const mutation of mutations) {
+          if (mutation.type === 'attributes' && mutation.attributeName === 'src') {
+            log('Iframe src attribute changed');
+            onVideoSourceChange();
+          }
+        }
+      });
+
+      iframeObserver.observe(player, {
+        attributes: true,
+        attributeFilter: ['src']
+      });
+    } else {
+      // Regular video element listeners
+      player.addEventListener('play', onVideoPlay);
+      player.addEventListener('ended', onVideoEnded);
+      player.addEventListener('loadedmetadata', () => {
+        log('Video metadata loaded');
+        onVideoSourceChange();
+      });
+      player.addEventListener('loadstart', () => {
+        log('Video load started');
+        onVideoSourceChange();
+      });
+      player.addEventListener('playing', () => {
+        log('Video playing event');
+        onVideoSourceChange();
+      });
+    }
   }
 
   // Monitor fullscreen state changes
@@ -307,10 +350,13 @@
   function init() {
     log('Initializing HiAnime Auto Fullscreen');
 
-    const video = findVideoPlayer();
-    if (video) {
-      attachVideoListeners(video);
-      video.setAttribute('data-autofs-monitored', 'true');
+    const player = findVideoPlayer();
+    if (player) {
+      log('Player type:', player.tagName);
+      attachVideoListeners(player);
+      player.setAttribute('data-autofs-monitored', 'true');
+    } else {
+      log('No player found yet, will wait for DOM changes');
     }
 
     // Check for video changes periodically
