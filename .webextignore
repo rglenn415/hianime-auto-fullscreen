@@ -29,3 +29,18 @@ validation_error.txt
 validation_errors.csv
 CSV-ANALYSIS-GUIDE.md
 VALIDATION-FIXES.md
+quick_update.sh
+*.sh
+*.py
+*.bat
+
+# Analysis and documentation files
+movie_analysis.md
+server_analysis.txt
+analysis_*.md
+TESTING.md
+ARCHITECTURE.md
+TEST_SUMMARY.md
+UPDATE_GUIDE.md
+fetch_page_data.py
+analyze_servers.py

@@ -1,0 +1,95 @@
+
+> hianime-auto-fullscreen@1.0.0 lint
+> web-ext lint --self-hosted
+
+Validation Summary:
+
+errors          0              
+notices         2              
+warnings        7              
+
+NOTICES:
+
+Code                Message     Description              File          Line   
+FLAGGED_FILE_TYPE   Flagged     Files whose names end    analyze_se…          
+                    file type   with flagged             rvers.py             
+                    found       extensions have been                          
+                                found in the add-on.                          
+                                The extension of these                        
+                                files are flagged                             
+                                because they usually                          
+                                identify binary                               
+                                components. Please see                        
+                                https://bit.ly/review…                        
+                                -policy for more                              
+                                information on the                            
+                                binary content review                         
+                                process.                                      
+FLAGGED_FILE_TYPE   Flagged     Files whose names end    fetch_page…          
+                    file type   with flagged             _data.py             
+                    found       extensions have been                          
+                                found in the add-on.                          
+                                The extension of these                        
+                                files are flagged                             
+                                because they usually                          
+                                identify binary                               
+                                components. Please see                        
+                                https://bit.ly/review…                        
+                                -policy for more                              
+                                information on the                            
+                                binary content review                         
+                                process.                                      
+WARNINGS:
+
+Code                     Message      Description              File          L
+FLAGGED_FILE_EXTENSION   Flagged      Files were found that    quick_upda…    
+                         file         are either unnecessary   te.sh          
+                         extensions   or have been included                   
+                         found        unintentionally. They                   
+                                      should be removed.                      
+INLINE_SCRIPT            Inline       Default CSP rules        tests/test…    
+                         scripts      prevent inline           -page.html     
+                         blocked by   JavaScript from                         
+                         default      running                                 
+                                      (https://mzl.la/2pn32…                  
+                                      nd).                                    
+INLINE_SCRIPT            Inline       Default CSP rules        coverage/l…    
+                         scripts      prevent inline           cov-report…    
+                         blocked by   JavaScript from          /index.html    
+                         default      running                                 
+                                      (https://mzl.la/2pn32…                  
+                                      nd).                                    
+INLINE_SCRIPT            Inline       Default CSP rules        coverage/l…    
+                         scripts      prevent inline           cov-report…    
+                         blocked by   JavaScript from          /content.j…    
+                         default      running                  s.html         
+                                      (https://mzl.la/2pn32…                  
+                                      nd).                                    
+INLINE_SCRIPT            Inline       Default CSP rules        coverage/l…    
+                         scripts      prevent inline           cov-report…    
+                         blocked by   JavaScript from          /popup.js.…    
+                         default      running                  html           
+                                      (https://mzl.la/2pn32…                  
+                                      nd).                                    
+UNSAFE_VAR_ASSIGNMENT    Unsafe       Due to both security     coverage/l…   2
+                         assignment   and performance          cov-report…    
+                         to           concerns, this may not   /prettify.…    
+                         innerHTML    be set using dynamic     js             
+                                      values which have not                   
+                                      been adequately                         
+                                      sanitized. This can                     
+                                      lead to security                        
+                                      issues or fairly                        
+                                      serious performance                     
+                                      degradation.                            
+UNSAFE_VAR_ASSIGNMENT    Unsafe       Due to both security     coverage/l…   8
+                         assignment   and performance          cov-report…    
+                         to           concerns, this may not   /sorter.js     
+                         innerHTML    be set using dynamic                    
+                                      values which have not                   
+                                      been adequately                         
+                                      sanitized. This can                     
+                                      lead to security                        
+                                      issues or fairly                        
+                                      serious performance                     
+                                      degradation.                            

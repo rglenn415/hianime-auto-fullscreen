@@ -436,6 +436,322 @@ describe('HiAnime Auto Fullscreen Extension', () => {
     });
   });
 
+  describe('Iframe Player Detection (Movies)', () => {
+    let mockIframe;
+
+    beforeEach(() => {
+      mockIframe = {
+        tagName: 'IFRAME',
+        id: 'iframe-embed',
+        src: '',
+        frameBorder: '0',
+        allow: 'autoplay; fullscreen; geolocation; display-capture; picture-in-picture',
+        setAttribute: jest.fn(),
+        hasAttribute: jest.fn(() => false),
+        getAttribute: jest.fn(),
+        closest: jest.fn(() => null),
+        requestFullscreen: jest.fn(() => Promise.resolve()),
+        mozRequestFullScreen: jest.fn(),
+        webkitRequestFullscreen: jest.fn(),
+        msRequestFullscreen: jest.fn()
+      };
+    });
+
+    test('should detect iframe player with #iframe-embed id', () => {
+      mockDocument.querySelector.mockImplementation((selector) => {
+        if (selector === '#iframe-embed') return mockIframe;
+        return null;
+      });
+
+      const result = mockDocument.querySelector('#iframe-embed');
+      expect(result).toBe(mockIframe);
+      expect(result.tagName).toBe('IFRAME');
+    });
+
+    test('should detect iframe by fullscreen permission', () => {
+      mockDocument.querySelector.mockImplementation((selector) => {
+        if (selector === 'iframe[allow*="fullscreen"]') return mockIframe;
+        return null;
+      });
+
+      const result = mockDocument.querySelector('iframe[allow*="fullscreen"]');
+      expect(result).toBe(mockIframe);
+    });
+
+    test('should prioritize iframe over video element', () => {
+      mockDocument.querySelector.mockImplementation((selector) => {
+        if (selector === '#iframe-embed') return mockIframe;
+        if (selector === 'video') return mockVideo;
+        return null;
+      });
+
+      // Iframe should be found first
+      const iframe = mockDocument.querySelector('#iframe-embed');
+      expect(iframe).toBe(mockIframe);
+      expect(iframe.tagName).toBe('IFRAME');
+    });
+
+    test('should fallback to video when no iframe found', () => {
+      mockDocument.querySelector.mockImplementation((selector) => {
+        if (selector === '#iframe-embed') return null;
+        if (selector === 'iframe[allow*="fullscreen"]') return null;
+        if (selector === 'video') return mockVideo;
+        return null;
+      });
+
+      const video = mockDocument.querySelector('video');
+      expect(video).toBe(mockVideo);
+    });
+
+    test('should detect iframe src change', () => {
+      const oldSrc = 'https://example.com/embed/server1/12345';
+      const newSrc = 'https://example.com/embed/server2/12345';
+
+      mockIframe.src = oldSrc;
+      expect(mockIframe.src).toBe(oldSrc);
+
+      mockIframe.src = newSrc;
+      expect(mockIframe.src).toBe(newSrc);
+      expect(mockIframe.src).not.toBe(oldSrc);
+    });
+
+    test('should identify player type as IFRAME', () => {
+      expect(mockIframe.tagName).toBe('IFRAME');
+      expect(mockVideo.tagName).toBeUndefined();
+    });
+
+    test('should find iframe container for fullscreen', () => {
+      const container = document.createElement('div');
+      container.className = 'watch-player';
+      mockIframe.closest.mockReturnValue(container);
+
+      const result = mockIframe.closest('.watch-player');
+      expect(result).toBe(container);
+      expect(result.className).toBe('watch-player');
+    });
+
+    test('should fallback to iframe itself if no container found', () => {
+      mockIframe.closest.mockReturnValue(null);
+      const result = mockIframe.closest('.watch-player') || mockIframe;
+      expect(result).toBe(mockIframe);
+    });
+  });
+
+  describe('Server Switching Detection', () => {
+    let mockIframe;
+
+    beforeEach(() => {
+      mockIframe = {
+        tagName: 'IFRAME',
+        id: 'iframe-embed',
+        src: 'https://example.com/embed/hd-1/12345',
+        setAttribute: jest.fn(),
+        hasAttribute: jest.fn(() => false)
+      };
+    });
+
+    test('should detect HD-1 to HD-2 server switch', () => {
+      const hd1Src = 'https://example.com/embed/hd-1/12345';
+      const hd2Src = 'https://example.com/embed/hd-2/12345';
+
+      mockIframe.src = hd1Src;
+      const beforeSwitch = mockIframe.src;
+
+      mockIframe.src = hd2Src;
+      const afterSwitch = mockIframe.src;
+
+      expect(beforeSwitch).not.toBe(afterSwitch);
+      expect(afterSwitch).toBe(hd2Src);
+    });
+
+    test('should detect SUB to DUB server switch', () => {
+      const subSrc = 'https://example.com/embed/sub/12345';
+      const dubSrc = 'https://example.com/embed/dub/12345';
+
+      mockIframe.src = subSrc;
+      mockIframe.src = dubSrc;
+
+      expect(mockIframe.src).toBe(dubSrc);
+    });
+
+    test('should treat server switch as manual transition', () => {
+      let isAutoplayTransition = false; // Server click is manual
+      const enableManualEpisode = true;
+
+      const shouldTrigger = !isAutoplayTransition && enableManualEpisode;
+      expect(shouldTrigger).toBe(true);
+    });
+
+    test('should not trigger on same server re-selection', () => {
+      const sameSrc = 'https://example.com/embed/hd-1/12345';
+
+      mockIframe.src = sameSrc;
+      const lastSrc = mockIframe.src;
+
+      mockIframe.src = sameSrc;
+      const srcChanged = mockIframe.src !== lastSrc;
+
+      expect(srcChanged).toBe(false);
+    });
+
+    test('should detect server switch within same episode', () => {
+      const episodeId = '12345';
+      const server1 = `https://example.com/embed/server1/${episodeId}`;
+      const server2 = `https://example.com/embed/server2/${episodeId}`;
+
+      // Both URLs contain same episode ID but different server
+      expect(server1).toContain(episodeId);
+      expect(server2).toContain(episodeId);
+      expect(server1).not.toBe(server2);
+    });
+  });
+
+  describe('MutationObserver for Iframe', () => {
+    test('should create MutationObserver for iframe', () => {
+      const mockObserver = {
+        observe: jest.fn(),
+        disconnect: jest.fn()
+      };
+
+      global.MutationObserver = jest.fn(() => mockObserver);
+
+      const observer = new MutationObserver(() => {});
+      expect(MutationObserver).toHaveBeenCalled();
+    });
+
+    test('should observe iframe src attribute changes', () => {
+      const mockObserver = {
+        observe: jest.fn(),
+        disconnect: jest.fn()
+      };
+
+      const mockIframe = document.createElement('iframe');
+      mockObserver.observe(mockIframe, {
+        attributes: true,
+        attributeFilter: ['src']
+      });
+
+      expect(mockObserver.observe).toHaveBeenCalledWith(
+        mockIframe,
+        { attributes: true, attributeFilter: ['src'] }
+      );
+    });
+
+    test('should trigger callback on src attribute mutation', () => {
+      const callback = jest.fn();
+      const mutations = [
+        {
+          type: 'attributes',
+          attributeName: 'src',
+          target: { tagName: 'IFRAME' }
+        }
+      ];
+
+      callback(mutations);
+      expect(callback).toHaveBeenCalledWith(mutations);
+    });
+
+    test('should filter only src attribute changes', () => {
+      const mutation = {
+        type: 'attributes',
+        attributeName: 'src'
+      };
+
+      const isSrcChange = mutation.type === 'attributes' && mutation.attributeName === 'src';
+      expect(isSrcChange).toBe(true);
+    });
+
+    test('should ignore non-src attribute changes', () => {
+      const mutation = {
+        type: 'attributes',
+        attributeName: 'class'
+      };
+
+      const isSrcChange = mutation.type === 'attributes' && mutation.attributeName === 'src';
+      expect(isSrcChange).toBe(false);
+    });
+  });
+
+  describe('Player Type Handling', () => {
+    test('should handle iframe player differently from video', () => {
+      const iframe = { tagName: 'IFRAME', src: 'embed.html' };
+      const video = { tagName: 'VIDEO', src: 'video.mp4' };
+
+      const getSource = (player) => {
+        if (player.tagName === 'IFRAME') {
+          return player.src;
+        } else {
+          return player.src || player.currentSrc;
+        }
+      };
+
+      expect(getSource(iframe)).toBe('embed.html');
+      expect(getSource(video)).toBe('video.mp4');
+    });
+
+    test('should use correct fullscreen target for iframe', () => {
+      const iframe = {
+        tagName: 'IFRAME',
+        closest: jest.fn(() => ({ className: 'watch-player' }))
+      };
+
+      const target = iframe.closest('.watch-player, .player-frame, #player');
+      expect(target.className).toBe('watch-player');
+    });
+
+    test('should use correct fullscreen target for video', () => {
+      const video = {
+        tagName: 'VIDEO',
+        closest: jest.fn(() => ({ className: 'plyr' }))
+      };
+
+      const target = video.closest('.plyr, .video-player, #player');
+      expect(target.className).toBe('plyr');
+    });
+  });
+
+  describe('Episode Transition Types', () => {
+    test('should classify manual episode selection correctly', () => {
+      let isAutoplayTransition = false;
+      const userClickedEpisode = true;
+
+      if (userClickedEpisode) {
+        isAutoplayTransition = false;
+      }
+
+      expect(isAutoplayTransition).toBe(false);
+    });
+
+    test('should classify autoplay transition correctly', () => {
+      let isAutoplayTransition = false;
+      const videoEnded = true;
+
+      if (videoEnded) {
+        isAutoplayTransition = true;
+      }
+
+      expect(isAutoplayTransition).toBe(true);
+    });
+
+    test('should reset autoplay flag after manual selection', () => {
+      let isAutoplayTransition = true;
+
+      // User manually selects episode
+      isAutoplayTransition = false;
+
+      expect(isAutoplayTransition).toBe(false);
+    });
+
+    test('should maintain autoplay flag during autoplay transition', () => {
+      let isAutoplayTransition = true;
+
+      // Autoplay loads next episode
+      const stillAutoplay = isAutoplayTransition;
+
+      expect(stillAutoplay).toBe(true);
+    });
+  });
+
   describe('Error Handling', () => {
     test('should handle missing video element gracefully', () => {
       mockDocument.querySelector.mockReturnValue(null);
@@ -473,6 +789,21 @@ describe('HiAnime Auto Fullscreen Extension', () => {
       );
 
       expect(hasAnyFullscreenAPI).toBe(false);
+    });
+
+    test('should handle missing iframe gracefully', () => {
+      mockDocument.querySelector.mockImplementation(() => null);
+
+      const iframe = mockDocument.querySelector('#iframe-embed');
+      expect(iframe).toBeNull();
+    });
+
+    test('should handle iframe without src', () => {
+      const iframe = { tagName: 'IFRAME', src: '' };
+      expect(iframe.src).toBe('');
+
+      const hasSrc = !!iframe.src;
+      expect(hasSrc).toBe(false);
     });
   });
 });

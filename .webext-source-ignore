@@ -1,0 +1,54 @@
+# Files to ignore when building with web-ext
+# This is used by web-ext build command
+
+# Development files
+node_modules
+tests
+coverage
+.git
+.github
+web-ext-artifacts
+dist
+docs
+
+# Scripts and utilities
+*.sh
+*.py
+*.bat
+build.js
+parse-validation-errors.js
+monitor-autoplay.js
+
+# Text and analysis files
+*.txt
+validation_errors.csv
+movie_analysis.md
+server_analysis.txt
+analysis_*.md
+
+# Documentation (except required files)
+TESTING.md
+ARCHITECTURE.md
+TEST_SUMMARY.md
+UPDATE_GUIDE.md
+CSV-ANALYSIS-GUIDE.md
+VALIDATION-FIXES.md
+
+# Development config
+package.json
+package-lock.json
+jest.config.js
+.npmrc
+.gitignore
+.webextignore
+.webext-source-ignore
+
+# Keep only these:
+# - manifest.json
+# - content.js
+# - popup.html
+# - popup.js
+# - popup.css
+# - LICENSE
+# - PRIVACY.md
+# - PERMISSIONS.md

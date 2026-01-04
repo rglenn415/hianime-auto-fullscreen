@@ -7,7 +7,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "build": "web-ext build --overwrite-dest --ignore-files=tests/ --ignore-files=coverage/ --ignore-files=node_modules/ --ignore-files=docs/ --ignore-files=dist/ --ignore-files='*.md' --ignore-files='!README.md' --ignore-files=package.json --ignore-files=package-lock.json --ignore-files=jest.config.js --ignore-files=build.js --ignore-files=parse-validation-errors.js --ignore-files=monitor-autoplay.js --ignore-files=validation_error.txt --ignore-files=validation_errors.csv --ignore-files=CSV-ANALYSIS-GUIDE.md --ignore-files=VALIDATION-FIXES.md --ignore-files=.git/ --ignore-files=.gitignore --ignore-files=.webextignore",
+    "build": "node build-clean.js",
     "lint": "web-ext lint --self-hosted"
   },
   "keywords": [
