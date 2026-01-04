@@ -7,8 +7,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "build": "node build-clean.js",
-    "lint": "web-ext lint --self-hosted"
+    "build": "node scripts/build-clean.js",
+    "lint": "web-ext lint --self-hosted --source-dir=src"
   },
   "keywords": [
     "firefox",
@@ -30,8 +30,8 @@
       "**/tests/**/*.test.js"
     ],
     "collectCoverageFrom": [
-      "content.js",
-      "popup.js"
+      "src/content.js",
+      "src/popup.js"
     ],
     "coveragePathIgnorePatterns": [
       "/node_modules/",

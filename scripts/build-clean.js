@@ -8,6 +8,9 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
+// Source directory
+const SRC_DIR = path.join(__dirname, '..', 'src');
+
 // Files that MUST be included in the extension package
 // Per Mozilla AMO: only files referenced in manifest.json are required
 const REQUIRED_FILES = [
@@ -19,15 +22,16 @@ const REQUIRED_FILES = [
 
 // NOTE: LICENSE and PRIVACY.md are provided via AMO submission form, NOT in the package
 
-// Verify all required files exist
-console.log('Verifying required files...');
+// Verify all required files exist in src/
+console.log('Verifying required files in src/...');
 let allFilesExist = true;
 
 for (const file of REQUIRED_FILES) {
-  if (fs.existsSync(file)) {
-    console.log(`✓ ${file}`);
+  const filePath = path.join(SRC_DIR, file);
+  if (fs.existsSync(filePath)) {
+    console.log(`✓ src/${file}`);
   } else {
-    console.error(`✗ ${file} - MISSING!`);
+    console.error(`✗ src/${file} - MISSING!`);
     allFilesExist = false;
   }
 }
@@ -39,48 +43,17 @@ if (!allFilesExist) {
 
 console.log('\nAll required files present.\n');
 
-// Build the ignore-files arguments
-const ignorePatterns = [
-  'node_modules/',
-  'tests/',
-  'coverage/',
-  'docs/',
-  'dist/',
-  'web-ext-artifacts/',
-  '.git/',
-  '.github/',
-  '*.sh',
-  '*.py',
-  '*.bat',
-  '*.js',  // Ignore all JS except the ones we need
-  '!content.js',  // But keep content.js
-  '!popup.js',    // But keep popup.js
-  '*.md',  // Ignore all markdown files (PRIVACY.md provided via AMO form)
-  'LICENSE',  // LICENSE provided via AMO form
-  '*.txt',
-  '*.csv',
-  'package.json',
-  'package-lock.json',
-  'jest.config.js',
-  '.gitignore',
-  '.webextignore',
-  '.webext-source-ignore',
-  '.npmrc'
-];
+// Build from src directory
+const buildCommand = `web-ext build --source-dir="${SRC_DIR}" --overwrite-dest`;
 
-const ignoreArgs = ignorePatterns.map(pattern => `--ignore-files="${pattern}"`).join(' ');
-
-const buildCommand = `web-ext build --overwrite-dest ${ignoreArgs}`;
-
-console.log('Building extension...\n');
-console.log('Command:', buildCommand.substring(0, 100) + '...\n');
+console.log('Building extension from src/...\n');
 
 try {
-  execSync(buildCommand, { stdio: 'inherit' });
+  execSync(buildCommand, { stdio: 'inherit', cwd: path.join(__dirname, '..') });
   console.log('\n✓ Build complete!');
 
   // Show what's in the artifacts folder
-  const artifactsDir = 'web-ext-artifacts';
+  const artifactsDir = path.join(__dirname, '..', 'web-ext-artifacts');
   if (fs.existsSync(artifactsDir)) {
     const files = fs.readdirSync(artifactsDir);
     console.log('\nBuilt packages:');
