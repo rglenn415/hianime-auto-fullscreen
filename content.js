@@ -6,7 +6,7 @@
 
   // Configuration constants
   const CONFIG = {
-    DEBUG_MODE: true, // Set to true during development to see console logs
+    DEBUG_MODE: false, // Set to true during development to see console logs
     FULLSCREEN_DELAY_MS: 1000,
     PLAY_EVENT_DELAY_MS: 500,
     POLL_INTERVAL_MS: 2000,

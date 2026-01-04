@@ -1,0 +1,93 @@
+Fetching: https://hianime.to/watch/memories-936?ep=15804
+
+Fetched 154,108 characters
+
+================================================================================
+SERVER-RELATED HTML ELEMENTS
+================================================================================
+
+1 server-related div elements found
+
+
+Server/Source Buttons (18 found):
+--------------------------------------------------------------------------------
+1. <a href="/watch/double-decker-doug-kirill-extra-2744" class="film-poster-ahref item-qtip" title="Double Decker! Doug &amp; Kirill: Extra" data-id="2744"><i class="fas fa-play"></i></a>
+
+2. <a href="/watch/galaxy-angel-z-2746" class="film-poster-ahref item-qtip" title="Galaxy Angel Z" data-id="2746"><i class="fas fa-play"></i></a>
+
+3. <a href="/watch/fist-of-the-north-star-the-movie-2749" class="film-poster-ahref item-qtip" title="Fist of the North Star: The Movie" data-id="2749"><i class="fas fa-play"></i></a>
+
+4. <a href="/watch/megaman-x-the-day-of-sigma-2750" class="film-poster-ahref item-qtip" title="Megaman X - The Day of Sigma" data-id="2750"><i class="fas fa-play"></i></a>
+
+5. <a href="/watch/children-of-the-sea-2751" class="film-poster-ahref item-qtip" title="Children of the Sea" data-id="2751"><i class="fas fa-play"></i></a>
+
+6. <a href="/watch/bodyguard-of-the-wind-2753" class="film-poster-ahref item-qtip" title="Bodyguard of the Wind" data-id="2753"><i class="fas fa-play"></i></a>
+
+7. <a href="/watch/gargantia-on-the-verdurous-planet-specials-2772" class="film-poster-ahref item-qtip" title="Gargantia on the Verdurous Planet: Specials" data-id="2772"><i class="fas fa-play"></i></a>
+
+8. <a href="/watch/the-pilots-love-song-2774" class="film-poster-ahref item-qtip" title="The Pilot&#39;s Love Song" data-id="2774"><i class="fas fa-play"></i></a>
+
+9. <a href="/watch/mars-daybreak-2754" class="film-poster-ahref item-qtip" title="Mars Daybreak" data-id="2754"><i class="fas fa-play"></i></a>
+
+10. <a href="/watch/please-teacher-2763" class="film-poster-ahref item-qtip" title="Please Teacher!" data-id="2763"><i class="fas fa-play"></i></a>
+
+11. <a href="/watch/pokemon-the-movie-05-heroes-2764" class="film-poster-ahref item-qtip" title="Pokemon The Movie 05: Heroes" data-id="2764"><i class="fas fa-play"></i></a>
+
+12. <a href="/watch/sarusuberi-miss-hokusai-2767" class="film-poster-ahref item-qtip" title="Sarusuberi: Miss Hokusai" data-id="2767"><i class="fas fa-play"></i></a>
+
+13. <a href="/watch/combat-mecha-xabungle-2768" class="film-poster-ahref item-qtip" title="Combat Mecha Xabungle" data-id="2768"><i class="fas fa-play"></i></a>
+
+14. <a href="/watch/flavors-of-youth-2771" class="film-poster-ahref item-qtip" title="Flavors of Youth" data-id="2771"><i class="fas fa-play"></i></a>
+
+15. <a href="/watch/pumpkin-scissors-2778" class="film-poster-ahref item-qtip" title="Pumpkin Scissors" data-id="2778"><i class="fas fa-play"></i></a>
+
+16. <a href="/watch/saikano-she-the-ultimate-weapon-2780" class="film-poster-ahref item-qtip" title="SaiKano: She, The Ultimate Weapon" data-id="2780"><i class="fas fa-play"></i></a>
+
+17. <a href="/watch/queen-millennia-2783" class="film-poster-ahref item-qtip" title="Queen Millennia" data-id="2783"><i class="fas fa-play"></i></a>
+
+18. <a href="/watch/tenchi-muyou-gxp-2785" class="film-poster-ahref item-qtip" title="Tenchi Muyou! GXP" data-id="2785"><i class="fas fa-play"></i></a>
+
+
+================================================================================
+JAVASCRIPT CODE (Server Loading)
+================================================================================
+
+1 relevant scripts found
+
+
+--- Script 1 ---
+
+    {
+        "page":"episode",
+        "name":"Memories",
+        "anime_id":"936",
+        "mal_id":"1462",
+        "anilist_id":"",
+        "series_url":"https://hianime.to/watch/memories-936"
+    }
+
+
+
+================================================================================
+DATA ATTRIBUTES ANALYSIS
+================================================================================
+
+NUMERIC_IDS:
+  - 936
+  - 2744
+  - 2746
+  - 2749
+  - 2750
+  - 2751
+  - 2753
+  - 2772
+  - 2774
+  - 2754
+
+================================================================================
+IFRAME ANALYSIS
+================================================================================
+
+1 iframe(s) found:
+
+1. <iframe id="iframe-embed" src="" frameborder="0" referrerpolicy="strict-origin" allow="autoplay; fullscreen; geolocation; display-capture; picture-in-picture" webkitallowfullscreen mozallowfullscreen></iframe>
