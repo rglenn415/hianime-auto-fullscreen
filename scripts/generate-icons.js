@@ -14,7 +14,9 @@ const ICON_SIZES = [
   { size: 16, name: 'icon-16.png' },
   { size: 32, name: 'icon-32.png' },
   { size: 48, name: 'icon-48.png' },
-  { size: 96, name: 'icon-96.png' }
+  { size: 64, name: 'icon-64.png' },
+  { size: 96, name: 'icon-96.png' },
+  { size: 128, name: 'icon-128.png' }
 ];
 
 async function generateIcons(sourcePath) {
