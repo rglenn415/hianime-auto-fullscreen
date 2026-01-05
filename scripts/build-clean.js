@@ -20,6 +20,11 @@ const REQUIRED_FILES = [
   'popup.js'        // Referenced in popup.html
 ];
 
+// Directories that should exist
+const REQUIRED_DIRS = [
+  'icons'  // Icon files referenced in manifest.json
+];
+
 // NOTE: LICENSE and PRIVACY.md are provided via AMO submission form, NOT in the package
 
 // Verify all required files exist in src/
@@ -36,12 +41,25 @@ for (const file of REQUIRED_FILES) {
   }
 }
 
+// Verify required directories exist
+console.log('\nVerifying required directories in src/...');
+for (const dir of REQUIRED_DIRS) {
+  const dirPath = path.join(SRC_DIR, dir);
+  if (fs.existsSync(dirPath) && fs.statSync(dirPath).isDirectory()) {
+    const files = fs.readdirSync(dirPath);
+    console.log(`✓ src/${dir}/ (${files.length} files)`);
+  } else {
+    console.error(`✗ src/${dir}/ - MISSING!`);
+    allFilesExist = false;
+  }
+}
+
 if (!allFilesExist) {
-  console.error('\nError: Some required files are missing!');
+  console.error('\nError: Some required files or directories are missing!');
   process.exit(1);
 }
 
-console.log('\nAll required files present.\n');
+console.log('\nAll required files and directories present.\n');
 
 // Build from src directory
 const buildCommand = `web-ext build --source-dir="${SRC_DIR}" --overwrite-dest`;
