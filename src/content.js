@@ -18,6 +18,7 @@
   let enableManualEpisode = true;
   let enableAutoplayEpisode = true;
   let lastVideoSrc = null;
+  let lastEpisodeUrl = null; // Track episode URL separately from video src
   let hasTriggeredFullscreen = false;
   let isAutoplayTransition = false;
   let autoplayCheckInterval = null; // Track interval to prevent memory leaks
@@ -326,20 +327,46 @@
     });
   }
 
+  // Extract episode ID from URL
+  function getEpisodeId(url) {
+    const match = url.match(/[?&]ep=(\d+)/);
+    return match ? match[1] : null;
+  }
+
   // Monitor URL changes (for single-page applications)
   let lastUrl = location.href;
   function checkUrlChange() {
     const currentUrl = location.href;
     if (currentUrl !== lastUrl) {
       log('URL changed:', lastUrl, '->', currentUrl);
-      lastUrl = currentUrl;
 
-      // Don't reset fullscreen flag if already in fullscreen
-      // This maintains fullscreen across episode changes
-      if (!isFullscreen()) {
+      const oldEpisodeId = getEpisodeId(lastUrl);
+      const newEpisodeId = getEpisodeId(currentUrl);
+      const isNewEpisode = oldEpisodeId !== newEpisodeId;
+
+      lastUrl = currentUrl;
+      lastEpisodeUrl = currentUrl;
+
+      // Always reset fullscreen flag on episode change
+      // This ensures fullscreen triggers even when resuming mid-episode
+      if (isNewEpisode) {
+        log('New episode detected:', oldEpisodeId, '->', newEpisodeId);
+        hasTriggeredFullscreen = false;
+        lastVideoSrc = null;
+
+        // Trigger fullscreen after player loads
+        // Use longer delay to ensure player is ready (especially for resume)
+        setTimeout(() => {
+          const player = findVideoPlayer();
+          if (player && !hasTriggeredFullscreen) {
+            log('Triggering fullscreen for new episode (may be resuming mid-episode)');
+            triggerFullscreen();
+          }
+        }, CONFIG.FULLSCREEN_DELAY_MS + 500);
+      } else if (!isFullscreen()) {
+        // Same episode, different URL (e.g., timestamp change)
         hasTriggeredFullscreen = false;
       }
-      lastVideoSrc = null;
 
       // Re-initialize after URL change
       setTimeout(init, 1000);
@@ -350,11 +377,33 @@
   function init() {
     log('Initializing HiAnime Auto Fullscreen');
 
+    // Track current episode URL on init
+    const currentEpisodeId = getEpisodeId(location.href);
+    const isFirstLoad = lastEpisodeUrl === null;
+    const isNewEpisode = isFirstLoad || getEpisodeId(lastEpisodeUrl) !== currentEpisodeId;
+
+    if (isNewEpisode) {
+      lastEpisodeUrl = location.href;
+      log('Episode URL:', location.href, '(Episode ID:', currentEpisodeId || 'none', ')');
+    }
+
     const player = findVideoPlayer();
     if (player) {
       log('Player type:', player.tagName);
       attachVideoListeners(player);
       player.setAttribute('data-autofs-monitored', 'true');
+
+      // On first load or new episode, trigger fullscreen after delay
+      // This handles the case where video resumes mid-episode
+      if (isNewEpisode && !hasTriggeredFullscreen) {
+        log('First load or new episode - scheduling fullscreen trigger');
+        setTimeout(() => {
+          if (!hasTriggeredFullscreen) {
+            log('Triggering fullscreen on initial load (may be resuming mid-episode)');
+            triggerFullscreen();
+          }
+        }, CONFIG.FULLSCREEN_DELAY_MS + 500);
+      }
     } else {
       log('No player found yet, will wait for DOM changes');
     }
