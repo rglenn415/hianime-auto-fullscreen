@@ -2,6 +2,37 @@
 
 All notable changes to the HiAnime Auto Fullscreen extension will be documented in this file.
 
+## [1.0.2] - 2026-01-10
+
+### Fixed
+- **Mid-Episode Resume**: Fullscreen now triggers correctly when resuming episodes from the middle
+  - Added episode ID tracking via URL parameter (`?ep=`) to detect episode transitions
+  - Extended player load delay (1.5s) to ensure video is ready when resuming
+  - Fullscreen triggers on initial page load for new episodes
+  - Works with HiAnime's "Continue Watching" feature
+
+### Added
+- **Additional Icon Sizes**: Added 64x64 and 128x128 icon sizes
+  - Updated icon generation scripts to create all 6 sizes (16, 32, 48, 64, 96, 128)
+  - Updated manifest.json with new icon references
+
+### Technical Details
+
+**Episode Detection** (`src/content.js:329-333`):
+- New `getEpisodeId()` function extracts episode ID from URL
+- Tracks `lastEpisodeUrl` separately from video source
+
+**URL Change Handling** (`src/content.js:335-373`):
+- `checkUrlChange()` now compares episode IDs to detect true episode transitions
+- Triggers fullscreen proactively when navigating to a new episode
+- Handles both fresh starts and mid-episode resumes
+
+**Initialization** (`src/content.js:375-419`):
+- `init()` now triggers fullscreen on first load when episode is detected
+- Uses 1.5 second delay to account for resume position loading
+
+---
+
 ## [1.0.1] - 2026-01-04
 
 ### Added

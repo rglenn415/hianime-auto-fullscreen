@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "HiAnime Auto Fullscreen",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Automatically fullscreens episodes on HiAnime with separate controls for manual and autoplay episodes",
   "author": "HiAnime Auto Fullscreen Contributors",
   "homepage_url": "https://github.com/rglenn415/hianime-auto-fullscreen",
