@@ -2,210 +2,189 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
 
-    html, body {
-      overflow: hidden;
-      background: #201f31;
-    }
+  /* Match Firefox popup container */
+  html, body {
+    background: #201f31;
+    border-radius: 8px;
+    overflow: hidden;
+  }
 
-    @keyframes glowPulse {
-      0%, 100% {
-        box-shadow:
-          inset 0 0 0 3px rgba(255, 186, 222, 0.5),
-          inset 0 0 20px rgba(255, 186, 222, 0.15);
-      }
-      50% {
-        box-shadow:
-          inset 0 0 0 3px rgba(255, 154, 203, 0.9),
-          inset 0 0 30px rgba(255, 186, 222, 0.3);
-      }
-    }
+  body {
+    width: 280px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    transform: translateZ(0);
+  }
 
-    body {
-      width: 280px;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-      color: #201f31;
-      margin: -1px;
-      border: none;
-      box-shadow:
-        inset 0 0 0 3px rgba(255, 186, 222, 0.6),
-        inset 0 0 20px rgba(255, 186, 222, 0.15);
-      animation: glowPulse 3s ease-in-out infinite;
-    }
+  /* Simple, static border */
+  .popup-root {
+    background: #201f31;
+    border-radius: 8px;
+    box-shadow: inset 0 0 0 2px rgba(255, 186, 222, 0.55);
+  }
 
+  .header {
+    background: linear-gradient(135deg, #ffbade 0%, #ff9acb 100%);
+    padding: 16px 20px;
+    text-align: center;
+  }
 
-    .header {
-      background: linear-gradient(135deg, #ffbade 0%, #ff9acb 100%);
-      padding: 16px 20px;
-      text-align: center;
-    }
+  .header h1 {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: #202125;
+  }
 
-    .header h1 {
-      font-size: 15px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      margin: 0;
-      color: #202125;
-    }
+  .content {
+    padding: 16px 20px;
+    background: #201f31;
+  }
 
-    .content {
-      padding: 16px 20px;
-      background: #201f31;
-    }
+  .toggle-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    transition: background 0.2s ease, border-color 0.2s ease;
+  }
 
-    .toggle-card {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-      padding: 14px 16px;
-      margin-bottom: 12px;
-      transition: all 0.2s ease;
-    }
+  .toggle-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 186, 222, 0.4);
+  }
 
-    .toggle-card:hover {
-      background: rgba(255, 255, 255, 0.08);
-      border-color: rgba(255, 186, 222, 0.4);
-    }
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
 
-    .toggle-card:last-child {
-      margin-bottom: 0;
-    }
+  .toggle-info {
+    flex: 1;
+    padding-right: 12px;
+  }
 
-    .toggle-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+  .toggle-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #fff;
+    margin-bottom: 4px;
+  }
 
-    .toggle-info {
-      flex: 1;
-      padding-right: 12px;
-    }
+  .toggle-desc {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+    line-height: 1.4;
+  }
 
-    .toggle-label {
-      font-size: 13px;
-      font-weight: 500;
-      color: #fff;
-      margin-bottom: 4px;
-    }
+  .switch {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    flex-shrink: 0;
+  }
 
-    .toggle-desc {
-      font-size: 11px;
-      color: rgba(255, 255, 255, 0.5);
-      line-height: 1.4;
-    }
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
 
-    /* Modern toggle switch */
-    .switch {
-      position: relative;
-      width: 44px;
-      height: 24px;
-      flex-shrink: 0;
-    }
+  .slider {
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.15);
+    transition: background 0.2s ease;
+    border-radius: 24px;
+    cursor: pointer;
+  }
 
-    .switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
+  .slider:before {
+    content: "";
+    position: absolute;
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
 
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(255, 255, 255, 0.15);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      border-radius: 24px;
-    }
+  input:checked + .slider {
+    background: #ffbade;
+  }
 
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 18px;
-      width: 18px;
-      left: 3px;
-      bottom: 3px;
-      background: #fff;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      border-radius: 50%;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    }
+  input:checked + .slider:before {
+    transform: translateX(20px);
+  }
 
-    input:checked + .slider {
-      background: #ffbade;
-    }
+  .footer {
+    padding: 12px 20px 16px;
+    text-align: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    background: #201f31;
+  }
 
-    input:checked + .slider:before {
-      transform: translateX(20px);
-    }
+  .footer a {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.4);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
 
-    input:focus + .slider {
-      box-shadow: 0 0 0 2px rgba(255, 186, 222, 0.3);
-    }
-
-    .footer {
-      padding: 12px 20px 16px;
-      text-align: center;
-      border-top: 1px solid rgba(255, 255, 255, 0.05);
-      background: #201f31;
-    }
-
-    .footer a {
-      font-size: 10px;
-      color: rgba(255, 255, 255, 0.4);
-      text-decoration: none;
-      transition: color 0.2s ease;
-    }
-
-    .footer a:hover {
-      color: #ffbade;
-    }
-  </style>
+  .footer a:hover {
+    color: #ffbade;
+  }
+</style>
 </head>
+
 <body>
-  <div class="header">
-    <h1>HiAnime Auto Fullscreen</h1>
-  </div>
+  <div class="popup-root">
+    <div class="header">
+      <h1>HiAnime Auto Fullscreen</h1>
+    </div>
 
-  <div class="content">
-    <div class="toggle-card">
-      <div class="toggle-row">
-        <div class="toggle-info">
-          <div class="toggle-label">Automatic Fullscreen</div>
-          <div class="toggle-desc">Automatic fullscreen when you click an episode</div>
+    <div class="content">
+      <div class="toggle-card">
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Automatic Fullscreen</div>
+            <div class="toggle-desc">Automatic fullscreen when you click an episode</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="manualEpisodeToggle">
+            <span class="slider"></span>
+          </label>
         </div>
-        <label class="switch">
-          <input type="checkbox" id="manualEpisodeToggle">
-          <span class="slider"></span>
-        </label>
+      </div>
+
+      <div class="toggle-card">
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Auto Fullscreen</div>
+            <div class="toggle-desc">Auto fullscreen works with Auto Play, Auto Next and Auto Skip Intro settings</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="autoplayEpisodeToggle">
+            <span class="slider"></span>
+          </label>
+        </div>
       </div>
     </div>
 
-    <div class="toggle-card">
-      <div class="toggle-row">
-        <div class="toggle-info">
-          <div class="toggle-label">Autoplay Fullscreen</div>
-          <div class="toggle-desc">Auto fullscreen on Auto Play, Auto Next and Auto Skip Intro settings</div>
-        </div>
-        <label class="switch">
-          <input type="checkbox" id="autoplayEpisodeToggle">
-          <span class="slider"></span>
-        </label>
-      </div>
+    <div class="footer">
+      <a href="https://github.com/rglenn415/hianime-auto-fullscreen" target="_blank">View on GitHub</a>
     </div>
-  </div>
-
-  <div class="footer">
-    <a href="https://github.com/rglenn415/hianime-auto-fullscreen" target="_blank">View on GitHub</a>
   </div>
 
   <script src="popup.js"></script>
