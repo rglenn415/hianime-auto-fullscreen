@@ -9,13 +9,36 @@
       box-sizing: border-box;
     }
 
+    html, body {
+      overflow: hidden;
+      background: #201f31;
+    }
+
+    @keyframes glowPulse {
+      0%, 100% {
+        box-shadow:
+          inset 0 0 0 3px rgba(255, 186, 222, 0.5),
+          inset 0 0 20px rgba(255, 186, 222, 0.15);
+      }
+      50% {
+        box-shadow:
+          inset 0 0 0 3px rgba(255, 154, 203, 0.9),
+          inset 0 0 30px rgba(255, 186, 222, 0.3);
+      }
+    }
+
     body {
       width: 280px;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-      background: #201f31;
-      color: #fff;
-      padding: 0;
+      color: #201f31;
+      margin: -1px;
+      border: none;
+      box-shadow:
+        inset 0 0 0 3px rgba(255, 186, 222, 0.6),
+        inset 0 0 20px rgba(255, 186, 222, 0.15);
+      animation: glowPulse 3s ease-in-out infinite;
     }
+
 
     .header {
       background: linear-gradient(135deg, #ffbade 0%, #ff9acb 100%);
@@ -31,15 +54,9 @@
       color: #202125;
     }
 
-    .header .subtitle {
-      font-size: 11px;
-      opacity: 0.8;
-      margin-top: 4px;
-      color: #202125;
-    }
-
     .content {
       padding: 16px 20px;
+      background: #201f31;
     }
 
     .toggle-card {
@@ -139,6 +156,7 @@
       padding: 12px 20px 16px;
       text-align: center;
       border-top: 1px solid rgba(255, 255, 255, 0.05);
+      background: #201f31;
     }
 
     .footer a {
@@ -150,25 +168,6 @@
 
     .footer a:hover {
       color: #ffbade;
-    }
-
-    .status-indicator {
-      display: inline-block;
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      margin-right: 6px;
-      background: #ffbade;
-      box-shadow: 0 0 6px rgba(255, 186, 222, 0.6);
-    }
-
-    .status-text {
-      font-size: 10px;
-      color: rgba(255, 255, 255, 0.6);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 12px;
     }
   </style>
 </head>
